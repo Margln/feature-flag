@@ -1,0 +1,63 @@
+server:
+  port: 9500
+
+spring:
+  application:
+    name: feature-server
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/apptest
+    username: root
+    password: root.1234
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+eureka:
+  client:
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${eureka.host:127.0.0.1}:${eureka.port:8761}/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    #心跳间隔
+    lease-renewal-interval-in-seconds: 5
+    metadata-map:
+      envTag: narmal
+
+management:
+  server:
+    port: ${server.port}
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    shutdown:
+      enabled: true
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+  info:
+    build:
+      enabled: true
+    defaults:
+      enabled: true
+
+logging:
+  level:
+    root: info
+    com:
+      xy: debug
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p})
+    %clr(${PID:- }){magenta} %clr([%X{traceId}]) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan}
+    %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+
+
+

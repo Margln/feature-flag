@@ -1,0 +1,83 @@
+server:
+    port: 8081
+
+spring:
+    application:
+        name: api-gateway
+    cloud:
+        gateway:
+            enabled: true
+            discovery:
+                locator:
+                    enabled: true #开启注册中心路由功能
+            routes: # 路由
+                - id: testapp
+                  uri: lb://testapp
+                  predicates:
+                      - Path=/testapp/api/**
+                  filters:
+                      - StripPrefix=1
+
+                - id: testapp2
+                  uri: lb://testapp2
+                  predicates:
+                      - Path=/testapp2/**
+                  filters:
+                      - StripPrefix=1
+
+                - id: feature-server
+                  uri: lb://feature-server
+                  predicates:
+                      - Path=/feature-server/**
+                  filters:
+                      - StripPrefix=1
+
+
+eureka:
+    client:
+        fetch-registry: true
+        service-url:
+            defaultZone: http://${eureka.host:127.0.0.1}:${eureka.port:8761}/eureka/
+    instance:
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${server.port}
+        metadata-map:
+            envTag: narmal
+        # 心跳间隔
+        lease-renewal-interval-in-seconds: 5
+        # 心跳超时
+        lease-expiration-duration-in-seconds: 10
+
+management:
+    server:
+        port: ${server.port}
+    endpoints:
+        web:
+            exposure:
+                include: health,info
+    endpoint:
+        shutdown:
+            enabled: true
+        info:
+            enabled: true
+        health:
+            enabled: true
+            show-details: always
+    info:
+        build:
+            enabled: true
+        defaults:
+            enabled: true
+
+logging:
+    level:
+        root: info
+        com:
+            xy: debug
+    pattern:
+        console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p})
+    %clr(${PID:- }){magenta} %clr([%X{traceId}]) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan}
+    %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+
+
+
